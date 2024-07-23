@@ -1,4 +1,4 @@
-package com.mimo2024.Atelier_de_robots;
+package com.example.Atelier_de_robots;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
