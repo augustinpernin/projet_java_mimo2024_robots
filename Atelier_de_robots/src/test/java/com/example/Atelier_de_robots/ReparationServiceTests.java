@@ -1,9 +1,7 @@
 package com.example.Atelier_de_robots;
 
 import com.example.Atelier_de_robots.entities.*;
-import com.example.Atelier_de_robots.services.FabricantService;
-import com.example.Atelier_de_robots.services.ReparationService;
-import com.example.Atelier_de_robots.services.RobotService;
+import com.example.Atelier_de_robots.services.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -137,6 +135,58 @@ public class ReparationServiceTests {
         });
 
         String expectedMessage = "Un robot ne peut pas avoir plus de trois réparations dans une année calendaire.";
+        String actualMessage = exception.getMessage();
+
+        assertTrue(actualMessage.contains(expectedMessage));
+    }
+
+    @Test
+    public void testReparationCostMustBeGreaterThanZero() {
+        // Création du fabricant
+        Fabricant fabricant = new Fabricant();
+        fabricant.setNom("Fabricant H");
+        fabricant.setPays("Allemagne");
+
+        // Sauvegarde du fabricant
+        fabricantService.createOrUpdateFabricant(fabricant);
+
+        // Création du robot
+        RobotIndustriel robot = new RobotIndustriel();
+        robot.setNom("Robot Industriel Test");
+        robot.setModele("X800");
+        robot.setDateFabrication(LocalDate.now().minusDays(200));
+        robot.setStatut("operationnel");
+        robot.setFabricant(fabricant);
+        robot.setSpecialisationIndustrielle("Production");
+
+        // Création des parties du robot industriel
+        Set<PartieRobot> parties = new HashSet<>();
+        parties.add(new PartieRobot(TypePartie.BRAS, robot));
+        parties.add(new PartieRobot(TypePartie.JAMBE, robot));
+        parties.add(new PartieRobot(TypePartie.TORSE, robot));
+        parties.add(new PartieRobot(TypePartie.TETE, robot));
+        parties.add(new PartieRobot(TypePartie.PUCE_ELECTRONIQUE, robot));
+        parties.add(new PartieRobot(TypePartie.BATTERIE, robot));
+        parties.add(new PartieRobot(TypePartie.RENFORCEMENT, robot));
+        parties.add(new PartieRobot(TypePartie.MODULE_SOUDE, robot));
+        parties.add(new PartieRobot(TypePartie.EQUIPEMENTS_SERRAGE, robot));
+        robot.setParties(parties);
+
+        // Sauvegarde du robot
+        robotService.createOrUpdateRobot(robot);
+
+        // Tentative de création d'une réparation avec un coût de zéro
+        Reparation reparation = new Reparation();
+        reparation.setRobot(robot);
+        reparation.setDateReparation(LocalDate.now());
+        reparation.setDescription("Réparation coût zéro");
+        reparation.setCout(BigDecimal.ZERO); // Coût zéro
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            reparationService.createOrUpdateReparation(reparation);
+        });
+
+        String expectedMessage = "Le coût de la réparation doit être supérieur à zéro.";
         String actualMessage = exception.getMessage();
 
         assertTrue(actualMessage.contains(expectedMessage));

@@ -6,6 +6,7 @@ import com.example.Atelier_de_robots.entities.Reparation;
 import com.example.Atelier_de_robots.entities.Robot;
 import com.example.Atelier_de_robots.repositories.ReparationRepository;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -19,10 +20,14 @@ public class ReparationService {
     @Autowired
     private RobotService robotService;
 
-// Create or Update
+    // Create or Update
     public Reparation createOrUpdateReparation(Reparation reparation) {
+        if (reparation.getCout().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("Le coût de la réparation doit être supérieur à zéro.");
+        }
+
         Robot robot = reparation.getRobot();
-        
+
         LocalDate startOfYear = LocalDate.of(reparation.getDateReparation().getYear(), 1, 1);
         LocalDate endOfYear = LocalDate.of(reparation.getDateReparation().getYear(), 12, 31);
 
