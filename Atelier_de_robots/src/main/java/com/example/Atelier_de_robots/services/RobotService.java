@@ -49,6 +49,11 @@ public class RobotService {
         robotRepository.delete(robot);
     }
 
+        // Delete all robots
+    public void deleteAllRobots() {
+         robotRepository.deleteAll();
+    }
+    
     private boolean robotEstComplet(Robot robot) {
         Map<TypePartie, Long> partsCount = robot.getParties().stream()
             .collect(Collectors.groupingBy(PartieRobot::getType, Collectors.counting()));

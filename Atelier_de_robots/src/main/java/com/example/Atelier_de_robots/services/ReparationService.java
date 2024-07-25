@@ -45,6 +45,11 @@ public class ReparationService {
     public void completeReparation(Reparation reparation) {
         Robot robot = reparation.getRobot();
         robot.setReparationEnCours(false);
+
+        if ("maintenance".equals(robot.getStatut()) || "hors service".equals(robot.getStatut())) {
+            robot.setStatut("operationnel");
+        }
+
         robotService.createOrUpdateRobot(robot);
         reparationRepository.save(reparation);
     }
