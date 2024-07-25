@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.example.Atelier_de_robots.entities.Fabricant;
 import com.example.Atelier_de_robots.repositories.FabricantRepository;
+import com.example.Atelier_de_robots.repositories.RobotRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,6 +14,9 @@ public class FabricantService {
 
     @Autowired
     private FabricantRepository fabricantRepository;
+
+    @Autowired
+    private RobotRepository robotRepository;
 
     // Create or Update
     public Fabricant createOrUpdateFabricant(Fabricant fabricant) {
@@ -32,6 +36,9 @@ public class FabricantService {
 
     // Delete
     public void deleteFabricant(Fabricant fabricant) {
+        if (robotRepository.existsByFabricant(fabricant)) {
+            throw new IllegalArgumentException("Un fabricant ne peut pas être supprimé s'il y a encore des robots associés à ce fabricant.");
+        }
         fabricantRepository.delete(fabricant);
     }
 }

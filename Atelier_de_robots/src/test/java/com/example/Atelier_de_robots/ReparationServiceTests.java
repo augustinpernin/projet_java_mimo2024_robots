@@ -2,6 +2,7 @@ package com.example.Atelier_de_robots;
 
 import com.example.Atelier_de_robots.entities.*;
 import com.example.Atelier_de_robots.services.FabricantService;
+import com.example.Atelier_de_robots.services.ReparationService;
 import com.example.Atelier_de_robots.services.RobotService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,9 @@ public class ReparationServiceTests {
 
     @Autowired
     private FabricantService fabricantService;
+
+    @Autowired
+    private ReparationService reparationService;
 
     @Test
     public void testCreateReparationWithInvalidDate() {
@@ -70,6 +74,69 @@ public class ReparationServiceTests {
         });
 
         String expectedMessage = "La date de réparation doit être postérieure à la date de fabrication du robot.";
+        String actualMessage = exception.getMessage();
+
+        assertTrue(actualMessage.contains(expectedMessage));
+    }
+
+    @Test
+    public void testCannotHaveMoreThanThreeReparationsInOneYear() {
+        // Création du fabricant
+        Fabricant fabricant = new Fabricant();
+        fabricant.setNom("Fabricant G");
+        fabricant.setPays("USA");
+
+        // Sauvegarde du fabricant
+        fabricantService.createOrUpdateFabricant(fabricant);
+
+        // Création du robot
+        RobotIndustriel robot = new RobotIndustriel();
+        robot.setNom("Robot Industriel Test");
+        robot.setModele("X700");
+        robot.setDateFabrication(LocalDate.now().minusDays(365));
+        robot.setStatut("operationnel");
+        robot.setFabricant(fabricant);
+        robot.setSpecialisationIndustrielle("Assemblage");
+
+        // Création des parties du robot industriel
+        Set<PartieRobot> parties = new HashSet<>();
+        parties.add(new PartieRobot(TypePartie.BRAS, robot));
+        parties.add(new PartieRobot(TypePartie.JAMBE, robot));
+        parties.add(new PartieRobot(TypePartie.TORSE, robot));
+        parties.add(new PartieRobot(TypePartie.TETE, robot));
+        parties.add(new PartieRobot(TypePartie.PUCE_ELECTRONIQUE, robot));
+        parties.add(new PartieRobot(TypePartie.BATTERIE, robot));
+        parties.add(new PartieRobot(TypePartie.RENFORCEMENT, robot));
+        parties.add(new PartieRobot(TypePartie.MODULE_SOUDE, robot));
+        parties.add(new PartieRobot(TypePartie.EQUIPEMENTS_SERRAGE, robot));
+        robot.setParties(parties);
+
+        // Sauvegarde du robot
+        robotService.createOrUpdateRobot(robot);
+
+        // Création et sauvegarde des trois premières réparations
+        for (int i = 1; i <= 3; i++) {
+            Reparation reparation = new Reparation();
+            reparation.setRobot(robot);
+            reparation.setDateReparation(LocalDate.now().minusDays(30 * i)); // Réparations espacées d'un mois
+            reparation.setDescription("Réparation test " + i);
+            reparation.setCout(new BigDecimal("100.0"));
+
+            reparationService.createOrUpdateReparation(reparation);
+        }
+
+        // Tentative de création d'une quatrième réparation dans la même année
+        Reparation reparation4 = new Reparation();
+        reparation4.setRobot(robot);
+        reparation4.setDateReparation(LocalDate.now().minusDays(10)); // Réparation dans la même année
+        reparation4.setDescription("Réparation test 4");
+        reparation4.setCout(new BigDecimal("100.0"));
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            reparationService.createOrUpdateReparation(reparation4);
+        });
+
+        String expectedMessage = "Un robot ne peut pas avoir plus de trois réparations dans une année calendaire.";
         String actualMessage = exception.getMessage();
 
         assertTrue(actualMessage.contains(expectedMessage));

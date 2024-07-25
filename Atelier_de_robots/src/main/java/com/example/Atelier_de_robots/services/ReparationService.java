@@ -6,7 +6,7 @@ import com.example.Atelier_de_robots.entities.Reparation;
 import com.example.Atelier_de_robots.entities.Robot;
 import com.example.Atelier_de_robots.repositories.ReparationRepository;
 
-
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,9 +19,19 @@ public class ReparationService {
     @Autowired
     private RobotService robotService;
 
-    // Create or Update
+// Create or Update
     public Reparation createOrUpdateReparation(Reparation reparation) {
         Robot robot = reparation.getRobot();
+        
+        LocalDate startOfYear = LocalDate.of(reparation.getDateReparation().getYear(), 1, 1);
+        LocalDate endOfYear = LocalDate.of(reparation.getDateReparation().getYear(), 12, 31);
+
+        long countReparations = reparationRepository.countByRobotAndDateReparationBetween(robot, startOfYear, endOfYear);
+
+        if (countReparations >= 3) {
+            throw new IllegalArgumentException("Un robot ne peut pas avoir plus de trois réparations dans une année calendaire.");
+        }
+
         robot.setReparationEnCours(true);
         robotService.createOrUpdateRobot(robot);
         return reparationRepository.save(reparation);
