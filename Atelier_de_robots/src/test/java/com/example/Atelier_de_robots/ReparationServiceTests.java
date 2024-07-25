@@ -2,7 +2,6 @@ package com.example.Atelier_de_robots;
 
 import com.example.Atelier_de_robots.entities.*;
 import com.example.Atelier_de_robots.services.FabricantService;
-import com.example.Atelier_de_robots.services.ReparationService;
 import com.example.Atelier_de_robots.services.RobotService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,9 +16,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 public class ReparationServiceTests {
-
-    @Autowired
-    private ReparationService reparationService;
 
     @Autowired
     private RobotService robotService;

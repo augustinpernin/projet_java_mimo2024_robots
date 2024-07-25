@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 import com.example.Atelier_de_robots.entities.*;
 import com.example.Atelier_de_robots.repositories.RobotRepository;
 
-import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -20,7 +19,11 @@ public class RobotService {
         if (!isNomUnique(robot.getNom(), robot.getId())) {
             throw new IllegalArgumentException("Le nom du robot doit être unique.");
         }
-
+    
+        if ((robot.getStatut().equals("maintenance") || robot.getStatut().equals("hors service")) && robot.isReparationEnCours()) {
+            throw new IllegalArgumentException("Un robot ne peut pas être mis en maintenance ou hors service si une réparation est en cours.");
+        }
+    
         if (robotEstComplet(robot)) {
             robot.setStatut("operationnel");
         } else {
@@ -28,6 +31,7 @@ public class RobotService {
         }
         return robotRepository.save(robot);
     }
+    
 
     // Read all
     public List<Robot> findAllRobots() {
@@ -87,9 +91,4 @@ public class RobotService {
         return true;
     }   
 
-        private void validateRobotDates(Robot robot) {
-        if (robot.getDateFabrication().isAfter(LocalDate.now())) {
-            throw new IllegalArgumentException("La date de fabrication ne peut pas être une date future.");
-        }
-    }
 }

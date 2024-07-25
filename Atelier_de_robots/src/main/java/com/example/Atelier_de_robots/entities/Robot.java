@@ -27,6 +27,9 @@ public class Robot {
     @OneToMany(mappedBy = "robot", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<PartieRobot> parties = new HashSet<>();
 
+    @Column(nullable = false)
+    private boolean reparationEnCours = false;
+
     // Getters and Setters
 
     public int getNombreRobotsProduitsModele(String modele) {
@@ -98,5 +101,13 @@ public class Robot {
     }
     public void setParties(Set<PartieRobot> parties) {
         this.parties = parties;
+    }
+    
+    public boolean isReparationEnCours() {
+        return reparationEnCours;
+    }
+    
+    public void setReparationEnCours(boolean reparationEnCours) {
+        this.reparationEnCours = reparationEnCours;
     }
 }
