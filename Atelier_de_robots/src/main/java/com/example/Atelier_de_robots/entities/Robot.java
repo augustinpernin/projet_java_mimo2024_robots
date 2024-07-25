@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
@@ -102,12 +103,31 @@ public class Robot {
     public void setParties(Set<PartieRobot> parties) {
         this.parties = parties;
     }
-    
+
     public boolean isReparationEnCours() {
         return reparationEnCours;
     }
     
     public void setReparationEnCours(boolean reparationEnCours) {
         this.reparationEnCours = reparationEnCours;
+    }
+
+
+    protected boolean robotEstComplet() {
+        Set<TypePartie> typesPartiesEssentielles = Set.of(
+                TypePartie.BRAS,
+                TypePartie.JAMBE,
+                TypePartie.TORSE,
+                TypePartie.TETE,
+                TypePartie.PUCE_ELECTRONIQUE,
+                TypePartie.BATTERIE
+        );
+
+        Set<TypePartie> typesPartiesRobot = getParties().stream()
+                .map(PartieRobot::getType)
+                .collect(Collectors.toSet());
+
+        return typesPartiesEssentielles.stream().allMatch(type -> typesPartiesRobot.contains(type) &&
+                getParties().stream().filter(partie -> partie.getType().equals(type)).count() == type.getMaxCount());
     }
 }

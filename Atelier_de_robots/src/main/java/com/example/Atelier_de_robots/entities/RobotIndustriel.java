@@ -4,6 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.DiscriminatorValue;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @DiscriminatorValue("INDUSTRIEL")
@@ -34,5 +35,27 @@ public class RobotIndustriel extends Robot {
 
     public void setPartiesSpecialisees(Set<String> partiesSpecialisees) {
         this.partiesSpecialisees = partiesSpecialisees;
+    }
+
+        @Override
+    protected boolean robotEstComplet() {
+        Set<TypePartie> typesPartiesEssentielles = Set.of(
+                TypePartie.BRAS,
+                TypePartie.JAMBE,
+                TypePartie.TORSE,
+                TypePartie.TETE,
+                TypePartie.PUCE_ELECTRONIQUE,
+                TypePartie.BATTERIE,
+                TypePartie.RENFORCEMENT,
+                TypePartie.MODULE_SOUDE,
+                TypePartie.EQUIPEMENTS_SERRAGE
+        );
+
+        Set<TypePartie> typesPartiesRobot = getParties().stream()
+                .map(PartieRobot::getType)
+                .collect(Collectors.toSet());
+
+        return typesPartiesEssentielles.stream().allMatch(type -> typesPartiesRobot.contains(type) &&
+                getParties().stream().filter(partie -> partie.getType().equals(type)).count() == type.getMaxCount());
     }
 }

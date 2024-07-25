@@ -230,4 +230,132 @@ public class RobotServiceTests {
 
         assertTrue(actualMessage.contains(expectedMessage));
     }
+
+    @Test
+    public void testBaseRobotIsOperationalOnlyIfComplete() {
+        // Création du fabricant
+        Fabricant fabricant = new Fabricant();
+        fabricant.setNom("Fabricant J");
+        fabricant.setPays("France");
+
+        // Sauvegarde du fabricant
+        fabricantService.createOrUpdateFabricant(fabricant);
+
+        // Création du robot incomplet
+        Robot robot = new Robot();
+        robot.setNom("Robot Incomplet Test");
+        robot.setModele("X1000");
+        robot.setDateFabrication(LocalDate.now().minusDays(200));
+        robot.setStatut("incomplet");
+        robot.setFabricant(fabricant);
+
+        // Création des parties manquantes
+        Set<PartieRobot> partiesIncompletes = new HashSet<>();
+        partiesIncompletes.add(new PartieRobot(TypePartie.BRAS, robot));
+        partiesIncompletes.add(new PartieRobot(TypePartie.TORSE, robot));
+        partiesIncompletes.add(new PartieRobot(TypePartie.TETE, robot));
+        partiesIncompletes.add(new PartieRobot(TypePartie.PUCE_ELECTRONIQUE, robot));
+        partiesIncompletes.add(new PartieRobot(TypePartie.BATTERIE, robot));
+        robot.setParties(partiesIncompletes);
+
+        // Sauvegarde du robot incomplet
+        robot = robotService.createOrUpdateRobot(robot);
+        assertEquals("incomplet", robot.getStatut());
+
+        // Ajout des parties manquantes pour le rendre complet
+        partiesIncompletes.add(new PartieRobot(TypePartie.JAMBE, robot));
+        robot.setParties(partiesIncompletes);
+
+        // Sauvegarde du robot complet
+        robot = robotService.createOrUpdateRobot(robot);
+        assertEquals("operationnel", robot.getStatut());
+    }
+
+    @Test
+    public void testIndustrielRobotIsOperationalOnlyIfComplete() {
+        // Création du fabricant
+        Fabricant fabricant = new Fabricant();
+        fabricant.setNom("Fabricant K");
+        fabricant.setPays("USA");
+
+        // Sauvegarde du fabricant
+        fabricantService.createOrUpdateFabricant(fabricant);
+
+        // Création du robot industriel incomplet
+        RobotIndustriel robotIndustriel = new RobotIndustriel();
+        robotIndustriel.setNom("Robot Industriel Incomplet Test");
+        robotIndustriel.setModele("X1100");
+        robotIndustriel.setDateFabrication(LocalDate.now().minusDays(200));
+        robotIndustriel.setStatut("incomplet");
+        robotIndustriel.setFabricant(fabricant);
+        robotIndustriel.setSpecialisationIndustrielle("Assemblage");
+
+        // Création des parties manquantes
+        Set<PartieRobot> partiesIncompletes = new HashSet<>();
+        partiesIncompletes.add(new PartieRobot(TypePartie.BRAS, robotIndustriel));
+        partiesIncompletes.add(new PartieRobot(TypePartie.TORSE, robotIndustriel));
+        partiesIncompletes.add(new PartieRobot(TypePartie.TETE, robotIndustriel));
+        partiesIncompletes.add(new PartieRobot(TypePartie.PUCE_ELECTRONIQUE, robotIndustriel));
+        partiesIncompletes.add(new PartieRobot(TypePartie.BATTERIE, robotIndustriel));
+        robotIndustriel.setParties(partiesIncompletes);
+
+        // Sauvegarde du robot industriel incomplet
+        robotIndustriel = (RobotIndustriel) robotService.createOrUpdateRobot(robotIndustriel);
+        assertEquals("incomplet", robotIndustriel.getStatut());
+
+        // Ajout des parties manquantes pour le rendre complet
+        partiesIncompletes.add(new PartieRobot(TypePartie.JAMBE, robotIndustriel));
+        partiesIncompletes.add(new PartieRobot(TypePartie.RENFORCEMENT, robotIndustriel));
+        partiesIncompletes.add(new PartieRobot(TypePartie.MODULE_SOUDE, robotIndustriel));
+        partiesIncompletes.add(new PartieRobot(TypePartie.EQUIPEMENTS_SERRAGE, robotIndustriel));
+        robotIndustriel.setParties(partiesIncompletes);
+
+        // Sauvegarde du robot industriel complet
+        robotIndustriel = (RobotIndustriel) robotService.createOrUpdateRobot(robotIndustriel);
+        assertEquals("operationnel", robotIndustriel.getStatut());
+    }
+
+    @Test
+    public void testMedicalRobotIsOperationalOnlyIfComplete() {
+        // Création du fabricant
+        Fabricant fabricant = new Fabricant();
+        fabricant.setNom("Fabricant L");
+        fabricant.setPays("Japon");
+
+        // Sauvegarde du fabricant
+        fabricantService.createOrUpdateFabricant(fabricant);
+
+        // Création du robot médical incomplet
+        RobotMedical robotMedical = new RobotMedical();
+        robotMedical.setNom("Robot Médical Incomplet Test");
+        robotMedical.setModele("X1200");
+        robotMedical.setDateFabrication(LocalDate.now().minusDays(200));
+        robotMedical.setStatut("incomplet");
+        robotMedical.setFabricant(fabricant);
+        robotMedical.setSpecialisationMedicale("Chirurgie");
+
+        // Création des parties manquantes
+        Set<PartieRobot> partiesIncompletes = new HashSet<>();
+        partiesIncompletes.add(new PartieRobot(TypePartie.BRAS, robotMedical));
+        partiesIncompletes.add(new PartieRobot(TypePartie.TORSE, robotMedical));
+        partiesIncompletes.add(new PartieRobot(TypePartie.TETE, robotMedical));
+        partiesIncompletes.add(new PartieRobot(TypePartie.PUCE_ELECTRONIQUE, robotMedical));
+        partiesIncompletes.add(new PartieRobot(TypePartie.BATTERIE, robotMedical));
+        robotMedical.setParties(partiesIncompletes);
+
+        // Sauvegarde du robot médical incomplet
+        robotMedical = (RobotMedical) robotService.createOrUpdateRobot(robotMedical);
+        assertEquals("incomplet", robotMedical.getStatut());
+
+        // Ajout des parties manquantes pour le rendre complet
+        partiesIncompletes.add(new PartieRobot(TypePartie.JAMBE, robotMedical));
+        partiesIncompletes.add(new PartieRobot(TypePartie.SCANNER_BIOMETRIQUE, robotMedical));
+        partiesIncompletes.add(new PartieRobot(TypePartie.DISTRIBUTEUR_MEDICAMENT, robotMedical));
+        partiesIncompletes.add(new PartieRobot(TypePartie.MODULE_PERSONNALITE, robotMedical));
+        robotMedical.setParties(partiesIncompletes);
+
+        // Sauvegarde du robot médical complet
+        robotMedical = (RobotMedical) robotService.createOrUpdateRobot(robotMedical);
+        assertEquals("operationnel", robotMedical.getStatut());
+    }
 }
