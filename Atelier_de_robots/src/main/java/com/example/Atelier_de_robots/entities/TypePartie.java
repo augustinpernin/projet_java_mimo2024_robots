@@ -6,6 +6,7 @@ public enum TypePartie {
     TORSE("Torse", 1),
     BATTERIE("Batterie", 1),
     PUCE_ELECTRONIQUE("Puce_électronique", 1),
+    TETE("Tête", 1),  // Ajout de la partie Tête
     RENFORCEMENT("Renforcement pour lever de charges lourdes", 1),
     MODULE_SOUDE("Module de soudure", 1),
     EQUIPEMENTS_SERRAGE("Equipements de serrage", 1),

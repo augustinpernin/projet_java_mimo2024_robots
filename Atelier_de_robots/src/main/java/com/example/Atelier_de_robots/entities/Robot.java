@@ -12,7 +12,10 @@ public class Robot {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+ 
+    @Column(nullable = false)
     private String nom;
+
     private String modele;
     private LocalDate dateFabrication;
     private String statut;

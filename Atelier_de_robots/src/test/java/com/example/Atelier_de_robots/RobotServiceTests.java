@@ -1,87 +1,129 @@
 package com.example.Atelier_de_robots;
 
-import com.example.Atelier_de_robots.entities.Fabricant;
-import com.example.Atelier_de_robots.entities.PartieRobot;
-import com.example.Atelier_de_robots.entities.Robot;
+import com.example.Atelier_de_robots.entities.*;
+import com.example.Atelier_de_robots.services.FabricantService;
 import com.example.Atelier_de_robots.services.RobotService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.junit.runner.RunWith;
 
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-@RunWith(SpringRunner.class)
 public class RobotServiceTests {
 
     @Autowired
     private RobotService robotService;
 
+    @Autowired
+    private FabricantService fabricantService;
+
     @Test
-    public void testCreateOrUpdateRobot() {
+    public void testCreateOrUpdateRobotWithUniqueName() {
         // Création du fabricant
         Fabricant fabricant = new Fabricant();
         fabricant.setNom("Fabricant A");
         fabricant.setPays("France");
 
-        // Création du robot
-        Robot robot = new Robot();
-        robot.setNom("Robot1");
+        // Sauvegarde du fabricant
+        fabricantService.createOrUpdateFabricant(fabricant);
+
+        // Création du robot industriel avec un nom unique
+        RobotIndustriel robot = new RobotIndustriel();
+        robot.setNom("Robot Industriel Unique");
         robot.setModele("X200");
         robot.setDateFabrication(LocalDate.now());
         robot.setStatut("incomplet");
         robot.setFabricant(fabricant);
+        robot.setSpecialisationIndustrielle("Manutention");
 
-        // Création des parties du robot (incomplet)
-        PartieRobot bras = new PartieRobot();
-        bras.setType("Bras");
-        bras.setRobot(robot);
-
-        PartieRobot jambe = new PartieRobot();
-        jambe.setType("Jambe");
-        jambe.setRobot(robot);
-
-        // Ajout des parties au robot
+        // Création des parties du robot industriel
         Set<PartieRobot> parties = new HashSet<>();
-        parties.add(bras);
-        parties.add(jambe);
+        parties.add(new PartieRobot(TypePartie.BRAS, robot));
+        parties.add(new PartieRobot(TypePartie.JAMBE, robot));
+        parties.add(new PartieRobot(TypePartie.TORSE, robot));
+        parties.add(new PartieRobot(TypePartie.TETE, robot));
+        parties.add(new PartieRobot(TypePartie.PUCE_ELECTRONIQUE, robot));
+        parties.add(new PartieRobot(TypePartie.BATTERIE, robot));
+        parties.add(new PartieRobot(TypePartie.RENFORCEMENT, robot));
+        parties.add(new PartieRobot(TypePartie.MODULE_SOUDE, robot));
+        parties.add(new PartieRobot(TypePartie.EQUIPEMENTS_SERRAGE, robot));
         robot.setParties(parties);
 
-        // Sauvegarde du robot (devrait être incomplet)
-        robotService.createOrUpdateRobot(robot);
-        assertEquals("incomplet", robot.getStatut());
+        // Sauvegarde du robot (devrait être opérationnel)
+        Robot savedRobot = robotService.createOrUpdateRobot(robot);
+        assertEquals("operationnel", savedRobot.getStatut());
+    }
 
-        // Ajout des parties manquantes pour rendre le robot complet
-        PartieRobot torse = new PartieRobot();
-        torse.setType("Torse");
-        torse.setRobot(robot);
+    @Test
+    public void testCreateRobotWithDuplicateName() {
+        // Création du fabricant
+        Fabricant fabricant = new Fabricant();
+        fabricant.setNom("Fabricant B");
+        fabricant.setPays("USA");
 
-        PartieRobot tete = new PartieRobot();
-        tete.setType("Tête");
-        tete.setRobot(robot);
+        // Sauvegarde du fabricant
+        fabricantService.createOrUpdateFabricant(fabricant);
 
-        PartieRobot puce = new PartieRobot();
-        puce.setType("Puce_électronique");
-        puce.setRobot(robot);
+        // Création du premier robot médical avec un nom
+        RobotMedical robot1 = new RobotMedical();
+        robot1.setNom("Robot Médical Duplicate");
+        robot1.setModele("M300");
+        robot1.setDateFabrication(LocalDate.now());
+        robot1.setStatut("incomplet");
+        robot1.setFabricant(fabricant);
+        robot1.setSpecialisationMedicale("Chirurgie");
 
-        PartieRobot batterie = new PartieRobot();
-        batterie.setType("Batterie");
-        batterie.setRobot(robot);
+        // Création des parties du premier robot médical
+        Set<PartieRobot> parties1 = new HashSet<>();
+        parties1.add(new PartieRobot(TypePartie.BRAS, robot1));
+        parties1.add(new PartieRobot(TypePartie.JAMBE, robot1));
+        parties1.add(new PartieRobot(TypePartie.TORSE, robot1));
+        parties1.add(new PartieRobot(TypePartie.TETE, robot1));
+        parties1.add(new PartieRobot(TypePartie.PUCE_ELECTRONIQUE, robot1));
+        parties1.add(new PartieRobot(TypePartie.BATTERIE, robot1));
+        parties1.add(new PartieRobot(TypePartie.SCANNER_BIOMETRIQUE, robot1));
+        parties1.add(new PartieRobot(TypePartie.DISTRIBUTEUR_MEDICAMENT, robot1));
+        parties1.add(new PartieRobot(TypePartie.MODULE_PERSONNALITE, robot1));
+        robot1.setParties(parties1);
 
-        // Ajout des nouvelles parties au robot
-        robot.getParties().add(torse);
-        robot.getParties().add(tete);
-        robot.getParties().add(puce);
-        robot.getParties().add(batterie);
+        // Sauvegarde du premier robot (devrait être opérationnel)
+        robotService.createOrUpdateRobot(robot1);
 
-        // Mise à jour du robot (devrait être opérationnel)
-        robotService.createOrUpdateRobot(robot);
-        assertEquals("operationnel", robot.getStatut());
+        // Création du deuxième robot médical avec le même nom
+        RobotMedical robot2 = new RobotMedical();
+        robot2.setNom("Robot Médical Duplicate");
+        robot2.setModele("M400");
+        robot2.setDateFabrication(LocalDate.now());
+        robot2.setStatut("incomplet");
+        robot2.setFabricant(fabricant);
+        robot2.setSpecialisationMedicale("Soins Intensifs");
+
+        // Création des parties du deuxième robot médical
+        Set<PartieRobot> parties2 = new HashSet<>();
+        parties2.add(new PartieRobot(TypePartie.BRAS, robot2));
+        parties2.add(new PartieRobot(TypePartie.JAMBE, robot2));
+        parties2.add(new PartieRobot(TypePartie.TORSE, robot2));
+        parties2.add(new PartieRobot(TypePartie.TETE, robot2));
+        parties2.add(new PartieRobot(TypePartie.PUCE_ELECTRONIQUE, robot2));
+        parties2.add(new PartieRobot(TypePartie.BATTERIE, robot2));
+        parties2.add(new PartieRobot(TypePartie.SCANNER_BIOMETRIQUE, robot2));
+        parties2.add(new PartieRobot(TypePartie.DISTRIBUTEUR_MEDICAMENT, robot2));
+        parties2.add(new PartieRobot(TypePartie.MODULE_PERSONNALITE, robot2));
+        robot2.setParties(parties2);
+
+        // Sauvegarde du deuxième robot (devrait lever une exception)
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            robotService.createOrUpdateRobot(robot2);
+        });
+
+        String expectedMessage = "Le nom du robot doit être unique.";
+        String actualMessage = exception.getMessage();
+
+        assertTrue(actualMessage.contains(expectedMessage));
     }
 }

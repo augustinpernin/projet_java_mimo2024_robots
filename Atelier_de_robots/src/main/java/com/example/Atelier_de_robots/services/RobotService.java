@@ -16,6 +16,10 @@ public class RobotService {
 
     // Create or Update
     public Robot createOrUpdateRobot(Robot robot) {
+        if (!isNomUnique(robot.getNom(), robot.getId())) {
+            throw new IllegalArgumentException("Le nom du robot doit être unique.");
+        }
+
         if (robotEstComplet(robot)) {
             robot.setStatut("operationnel");
         } else {
@@ -71,4 +75,14 @@ public class RobotService {
 
         return true;
     }
+
+    private boolean isNomUnique(String nom, Long id) {
+        List<Robot> robots = robotRepository.findAll();
+        for (Robot existingRobot : robots) {
+            if (existingRobot.getNom().equals(nom) && !Objects.equals(existingRobot.getId(), id)) {
+                return false;
+            }
+        }
+        return true;
+    }   
 }
