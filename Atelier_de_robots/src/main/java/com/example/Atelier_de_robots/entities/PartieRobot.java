@@ -1,6 +1,6 @@
 package com.example.Atelier_de_robots.entities;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Entity
 public class PartieRobot {

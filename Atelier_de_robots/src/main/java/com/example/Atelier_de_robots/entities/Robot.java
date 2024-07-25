@@ -1,6 +1,6 @@
 package com.example.Atelier_de_robots.entities;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;

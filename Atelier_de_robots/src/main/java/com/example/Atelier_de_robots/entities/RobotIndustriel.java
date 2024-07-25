@@ -1,7 +1,7 @@
 package com.example.Atelier_de_robots.entities;
 
-import javax.persistence.Entity;
-import javax.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
+import jakarta.persistence.DiscriminatorValue;
 
 @Entity
 @DiscriminatorValue("INDUSTRIEL")
