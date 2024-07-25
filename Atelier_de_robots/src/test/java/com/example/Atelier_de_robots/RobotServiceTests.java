@@ -126,4 +126,46 @@ public class RobotServiceTests {
 
         assertTrue(actualMessage.contains(expectedMessage));
     }
+
+    @Test
+    public void testCreateRobotWithFutureFabricationDate() {
+        // Création du fabricant
+        Fabricant fabricant = new Fabricant();
+        fabricant.setNom("Fabricant C");
+        fabricant.setPays("Canada");
+
+        // Sauvegarde du fabricant
+        fabricantService.createOrUpdateFabricant(fabricant);
+
+        // Création du robot avec une date de fabrication future
+        RobotIndustriel robot = new RobotIndustriel();
+        robot.setNom("Robot Future Date");
+        robot.setModele("X300");
+        robot.setStatut("incomplet");
+        robot.setFabricant(fabricant);
+        robot.setSpecialisationIndustrielle("Manutention");
+
+        // Création des parties du robot industriel
+        Set<PartieRobot> parties = new HashSet<>();
+        parties.add(new PartieRobot(TypePartie.BRAS, robot));
+        parties.add(new PartieRobot(TypePartie.JAMBE, robot));
+        parties.add(new PartieRobot(TypePartie.TORSE, robot));
+        parties.add(new PartieRobot(TypePartie.TETE, robot));
+        parties.add(new PartieRobot(TypePartie.PUCE_ELECTRONIQUE, robot));
+        parties.add(new PartieRobot(TypePartie.BATTERIE, robot));
+        parties.add(new PartieRobot(TypePartie.RENFORCEMENT, robot));
+        parties.add(new PartieRobot(TypePartie.MODULE_SOUDE, robot));
+        parties.add(new PartieRobot(TypePartie.EQUIPEMENTS_SERRAGE, robot));
+        robot.setParties(parties);
+
+        // Test de l'exception lors de la définition de la date de fabrication
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            robot.setDateFabrication(LocalDate.now().plusDays(1)); // Date future
+        });
+
+        String expectedMessage = "La date de fabrication ne peut pas être une date future.";
+        String actualMessage = exception.getMessage();
+
+        assertTrue(actualMessage.contains(expectedMessage));
+    }
 }

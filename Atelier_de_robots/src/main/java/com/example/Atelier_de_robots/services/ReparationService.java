@@ -34,4 +34,10 @@ public class ReparationService {
     public void deleteReparation(Reparation reparation) {
         reparationRepository.delete(reparation);
     }
+
+    private void validateReparationDate(Reparation reparation) {
+        if (reparation.getDateReparation().isBefore(reparation.getRobot().getDateFabrication())) {
+            throw new IllegalArgumentException("La date de réparation doit être postérieure à la date de fabrication du robot.");
+        }
+    }
 }

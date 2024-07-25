@@ -9,13 +9,18 @@ public class Reparation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private LocalDate dateReparation;
-    private String description;
-    private BigDecimal cout;
 
     @ManyToOne
     @JoinColumn(name = "id_robot")
     private Robot robot;
+
+    @Column(nullable = false)
+    private LocalDate dateReparation;
+
+    private String description;
+    private BigDecimal cout;
+
+    // Getters and Setters
 
     public Long getId() {
         return id;
@@ -25,11 +30,22 @@ public class Reparation {
         this.id = id;
     }
 
+    public Robot getRobot() {
+        return robot;
+    }
+
+    public void setRobot(Robot robot) {
+        this.robot = robot;
+    }
+
     public LocalDate getDateReparation() {
         return dateReparation;
     }
 
     public void setDateReparation(LocalDate dateReparation) {
+        if (dateReparation.isBefore(this.robot.getDateFabrication())) {
+            throw new IllegalArgumentException("La date de réparation doit être postérieure à la date de fabrication du robot.");
+        }
         this.dateReparation = dateReparation;
     }
 
@@ -48,14 +64,4 @@ public class Reparation {
     public void setCout(BigDecimal cout) {
         this.cout = cout;
     }
-
-    public Robot getRobot() {
-        return robot;
-    }
-
-    public void setRobot(Robot robot) {
-        this.robot = robot;
-    }
-
-    // Getters and Setters
 }

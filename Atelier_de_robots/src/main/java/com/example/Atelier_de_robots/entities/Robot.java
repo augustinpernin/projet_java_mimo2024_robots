@@ -39,6 +39,9 @@ public class Robot {
         return 0; // Placeholder
     }
 
+
+
+
     public Long getId() {
         return id;
     }
@@ -68,6 +71,9 @@ public class Robot {
     }
 
     public void setDateFabrication(LocalDate dateFabrication) {
+        if (dateFabrication.isAfter(LocalDate.now())) {
+            throw new IllegalArgumentException("La date de fabrication ne peut pas être une date future.");
+        }
         this.dateFabrication = dateFabrication;
     }
 

@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import com.example.Atelier_de_robots.entities.*;
 import com.example.Atelier_de_robots.repositories.RobotRepository;
 
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -85,4 +86,10 @@ public class RobotService {
         }
         return true;
     }   
+
+        private void validateRobotDates(Robot robot) {
+        if (robot.getDateFabrication().isAfter(LocalDate.now())) {
+            throw new IllegalArgumentException("La date de fabrication ne peut pas être une date future.");
+        }
+    }
 }
