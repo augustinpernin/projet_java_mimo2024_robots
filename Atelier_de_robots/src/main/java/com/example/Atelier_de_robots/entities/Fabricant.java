@@ -47,5 +47,4 @@ public class Fabricant {
         this.robots = robots;
     }
 
-    // Getters and Setters
 }

@@ -2,12 +2,12 @@ package com.example.Atelier_de_robots.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.example.Atelier_de_robots.entities.Robot;
+import com.example.Atelier_de_robots.entities.*;
 import com.example.Atelier_de_robots.repositories.RobotRepository;
-import com.example.Atelier_de_robots.entities.PartieRobot;
+
 import java.util.Arrays;
-import java.util.Set;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,8 +30,18 @@ public class RobotService {
         Set<String> typesPartiesRobot = robot.getParties().stream()
                                              .map(PartieRobot::getType)
                                              .collect(Collectors.toSet());
-        return typesPartiesNecessaires.equals(typesPartiesRobot);
+        boolean partiesNecessairesComplet = typesPartiesNecessaires.equals(typesPartiesRobot);
+
+        if (robot instanceof RobotIndustriel) {
+            RobotIndustriel robotIndustriel = (RobotIndustriel) robot;
+            return partiesNecessairesComplet && typesPartiesRobot.containsAll(robotIndustriel.getPartiesSpecialisees());
+        } else if (robot instanceof RobotMedical) {
+            RobotMedical robotMedical = (RobotMedical) robot;
+            return partiesNecessairesComplet && typesPartiesRobot.containsAll(robotMedical.getPartiesSpecialisees());
+        }
+
+        return partiesNecessairesComplet;
     }
 
-
+    // Autres méthodes de service
 }
