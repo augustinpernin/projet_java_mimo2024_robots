@@ -7,12 +7,23 @@ public class PartieRobot {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String type; // Ex: "Bras", "Jambe", "Torse", "Tête", "Puce_électronique", "Batterie"
+
+    @Enumerated(EnumType.STRING)
+    private TypePartie type;
 
     @ManyToOne
     @JoinColumn(name = "id_robot")
     private Robot robot;
 
+    // Constructor
+    public PartieRobot() {}
+
+    public PartieRobot(TypePartie type, Robot robot) {
+        this.type = type;
+        this.robot = robot;
+    }
+
+    // Getters and Setters
     public Long getId() {
         return id;
     }
@@ -21,11 +32,11 @@ public class PartieRobot {
         this.id = id;
     }
 
-    public String getType() {
+    public TypePartie getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(TypePartie type) {
         this.type = type;
     }
 
@@ -36,5 +47,4 @@ public class PartieRobot {
     public void setRobot(Robot robot) {
         this.robot = robot;
     }
-
 }
